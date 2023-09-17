@@ -1,0 +1,23 @@
+---
+- name: Install httpd and PHP if memory > 0.5GB
+  hosts: client
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Check total memory
+      set_fact:
+        total_memory_gb: "{{ ansible_memtotal_mb  }}"
+      run_once: true
+
+    - name: Install required packages
+      package:
+        name:
+          - httpd
+          - php
+          - php-common
+          - php-pecl-apcu
+          - php-cli
+          - php-mysqlnd
+        state: present
+      when: total_memory_gb > 512
