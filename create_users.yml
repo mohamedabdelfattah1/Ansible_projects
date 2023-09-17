@@ -1,0 +1,30 @@
+--- 
+- name: Create user for each site
+  hosts: ansible3
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Create sites
+      set_fact:
+        sites:
+          - name: ahmed.com
+            dir: /var/www/html/ahmed.com
+            username: ahmed
+          - name: mohamed.com
+            dir: /var/www/html/mohamed.com
+            username: mohamed
+    - name:  Create users for each site
+      user: 
+        name: "{{ item.username }}"
+        state: present
+      loop: "{{ sites }}"
+
+    - name: Create directories
+      file: 
+        path: "{{item.dir}}"
+        state: directory
+        owner: "{{item.username}}"
+        group: apache
+        mode: '0750'
+      loop: "{{ sites }}"
+      when: sites is defined
