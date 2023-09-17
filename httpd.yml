@@ -1,0 +1,45 @@
+---
+- name: Install LAMP Stack
+  hosts: ansible3
+  become: yes  # Run tasks with sudo or root privileges
+
+  tasks:
+    - name: Install MariaDB
+      yum:
+        name: mariadb-server
+        state: present
+
+    - name: Start and enable MariaDB
+      systemd:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    - name: Install Apache HTTP Server (httpd)
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start and enable httpd
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Install PHP and PHP modules
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - php
+        - php-mysqlnd
+        - php-common
+        - php-cli
+        - php-json
+        - php-gd
+        - php-mbstring
+
+    - name: Restart httpd after PHP installation
+      systemd:
+        name: httpd
+        state: restarted
